@@ -1,42 +1,92 @@
-#root {
-  max-width: 1280px;
-  margin: 0 auto;
-  padding: 2rem;
+.navbar {
+  display: flex;
+  justify-content: start;
+  background-color: #282828;
+  padding-top: 15px;
+  padding-bottom: 15px;
+  padding-left: 20px;
+}
+
+.nav-link {
+  color: white;
+  margin-right: 20px;
+  margin-left: 20px;
+  text-decoration: none;
+  font-size: 18px;
+}
+
+.nav-link:hover {
+  text-decoration: underline;
+  color:rgb(180, 180, 180)
+}
+
+.dashboard {
   text-align: center;
 }
 
-.logo {
-  height: 6em;
-  padding: 1.5em;
-  will-change: filter;
-  transition: filter 300ms;
-}
-.logo:hover {
-  filter: drop-shadow(0 0 2em #646cffaa);
-}
-.logo.react:hover {
-  filter: drop-shadow(0 0 2em #61dafbaa);
+.landing-image {
+  margin: 60px auto;
+  height: 300px;
+  width: 100%;
 }
 
-@keyframes logo-spin {
-  from {
-    transform: rotate(0deg);
-  }
-  to {
-    transform: rotate(360deg);
-  }
+.placeholder-image {
+  width: 100%;
+  height: 300px;
+  background-image: url('/background.jpg');
+  background-repeat: repeat-x;
+  background-size: contain;
 }
 
-@media (prefers-reduced-motion: no-preference) {
-  a:nth-of-type(2) .logo {
-    animation: logo-spin infinite 20s linear;
-  }
+.buttons {
+  display: flex;
+  justify-content: center;
+  gap: 20px;
+}
+
+.button {
+  padding: 10px 20px;
+  background-color: #4CAF50;
+  color: white;
+  text-decoration: none;
+  border-radius: 5px;
+}
+
+.button:hover {
+  background-color: #45a049;
+}
+
+.products .grid {
+  display: grid;
+  margin-inline: 50px;
+  grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+  gap: 20px;
+}
+
+.pageTitle {
+  margin-left: 50px;
+  margin-top: 20px;
+  margin-bottom: 20px;
+  font-size: 25px;
+  font-weight: bold;
 }
 
 .card {
-  padding: 2em;
+  border: 1px solid #ddd;
+  border-radius: 12px;
+  padding: 10px;
+  text-align: center;
 }
 
-.read-the-docs {
-  color: #888;
+.card-image {
+  max-width: 100%;
+  height: auto;
+}
+
+.suppliers .supplier {
+  margin-bottom: 20px;
+}
+
+.address {
+  font-style: italic;
 }
