@@ -79,8 +79,11 @@ func Detail(id int) entities.Kue {
 func Update(id int, kue entities.Kue) bool {
 	// Menyisipkan data ke dalam tabel Kue
 	result, err := config.DB.Exec(`
-		UPDATE Kue SET nama = ?, img = ?, deskripsi = ?, harga = ?, berat = ?, supplier_id = ?, varian_id = ?, updatedAt = ?
+		UPDATE Kue SET nama = ?, deskripsi = ?, harga = ?, berat = ?, supplier_id = ?, varian_id = ?, updated_at = ?
 		WHERE id = ?`,
+		// `
+		// UPDATE Kue SET nama = ?, img = ?, deskripsi = ?, harga = ?, berat = ?, supplier_id = ?, varian_id = ?, updated_at = ?
+		// WHERE id = ?`,
 		kue.Nama,
 		// kue.Img,
 		kue.Deskripsi,
