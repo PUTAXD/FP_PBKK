@@ -6,7 +6,20 @@ import (
 )
 
 func GetAll() []entities.Kue {
-	rows, err := config.DB.Query(`SELECT * FROM Kue`)
+	rows, err := config.DB.Query(`
+	SELECT 
+		k.id, 
+		k.nama, 
+		k.deskripsi, 
+		k.harga, 
+		k.berat, 
+		k.supplier_id, 
+		k.varian_id, 
+		k.created_at, 
+		k.updated_at,
+		v.nama AS varian_nama
+	FROM Kue k
+	LEFT JOIN Varian v ON k.varian_id = v.id`)
 	if err != nil {
 		panic(err)
 	}
@@ -17,7 +30,7 @@ func GetAll() []entities.Kue {
 	for rows.Next() {
 		var Kue entities.Kue
 		// if err := rows.Scan(&Kue.Id, &Kue.Nama,&Kue.Img, &Kue.Deskripsi, &Kue.Harga, &Kue.Berat, &Kue.SupplierID, &Kue.VarianID, &Kue.CreatedAt, &Kue.UpdatedAt); err != nil {
-		if err := rows.Scan(&Kue.Id, &Kue.Nama, &Kue.Deskripsi, &Kue.Harga, &Kue.Berat, &Kue.SupplierID, &Kue.VarianID, &Kue.CreatedAt, &Kue.UpdatedAt); err != nil {
+		if err := rows.Scan(&Kue.Id, &Kue.Nama, &Kue.Deskripsi, &Kue.Harga, &Kue.Berat, &Kue.SupplierID, &Kue.VarianID, &Kue.CreatedAt, &Kue.UpdatedAt, &Kue.VarianNama); err != nil {
 			panic(err)
 		}
 

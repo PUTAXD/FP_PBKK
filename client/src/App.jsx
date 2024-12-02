@@ -1,5 +1,5 @@
 import React, { useEffect, useState } from 'react';
-import { BrowserRouter as Router, Route, Routes, NavLink } from 'react-router-dom';
+import { BrowserRouter as Router, Route, Routes, NavLink, useParams } from 'react-router-dom';
 import './App.css';
 
 function App() {
@@ -12,6 +12,7 @@ function App() {
           <Route path="/products" element={<Products />} />
           <Route path="/suppliers" element={<Suppliers />} />
           <Route path="/manage-products" element={<ManageProducts />} />
+          <Route path="/products/:id" element={<ProductPage />} />
         </Routes>
       </div>
     </Router>
@@ -72,6 +73,24 @@ function Products() {
     return queryWords.every((word) => product.nama.toLowerCase().includes(word));
   });
 
+  // Group products by name and calculate price range
+  const groupedProducts = filteredProducts.reduce((acc, product) => {
+    const existing = acc.find((p) => p.nama === product.nama);
+    if (existing) {
+      existing.minPrice = Math.min(existing.minPrice, product.harga);
+      existing.maxPrice = Math.max(existing.maxPrice, product.harga);
+      existing.variantCount += 1;
+    } else {
+      acc.push({
+        ...product,
+        minPrice: product.harga,
+        maxPrice: product.harga,
+        variantCount: 1, // Keep track of how many variants exist
+      });
+    }
+    return acc;
+  }, []);
+
   return (
     <div className="products">
       <h2 className="pageTitle">Our Products</h2>
@@ -86,24 +105,128 @@ function Products() {
         <a className="mng-product-href" href="/manage-products"><button className="mng-product-btn">Manage Products</button></a>
       </div>
       <div className="grid">
-        {filteredProducts.map((product) => (
-          <div key={product.id} className="card">
-            <div className="card-content">
-              <div className="card-image">
-                <img src="/imgplaceholder.png" alt={product.nama} />
-              </div>
-              <div className="card-details">
-                <h2>{product.nama}</h2>
-                <p>{product.deskripsi}</p>
-                <p className="price">Rp {product.harga}</p>
+        {groupedProducts.map((product) => (
+          <a key={product.id}
+            href={`/products/${product.id}`}
+            className="card-link">
+            <div className="card">
+              <div className="card-content">
+                <div className="card-image">
+                  <img src="/imgplaceholder.png" alt={product.nama} />
+                </div>
+                <div className="card-details">
+                  <h2>{product.nama}</h2>
+                  <p>{product.deskripsi.length > 60 ? product.deskripsi.slice(0, 60) + '...' : product.deskripsi}</p>
+                  <p className="price">
+                    {product.variantCount > 1 
+                      ? `Rp ${product.minPrice} ~ Rp ${product.maxPrice}` 
+                      : `Rp ${product.minPrice}`}
+                  </p>
+                </div>
               </div>
             </div>
-          </div>
+          </a>
         ))}
       </div>
     </div>
   );
 }
+
+function ProductPage() {
+  const { id } = useParams();
+  const [product, setProduct] = useState(null);
+  const [variants, setVariants] = useState([]);
+  const [selectedVariant, setSelectedVariant] = useState(null);
+
+  useEffect(() => {
+    // Fetch the main product details by ID
+    fetch(`http://localhost:8080/kue/${id}`)
+      .then((res) => {
+        if (!res.ok) throw new Error("Failed to fetch product details");
+        return res.json();
+      })
+      .then((data) => {
+        console.log("Main product details:", data); // Log the main product details
+        setProduct(data);
+        setSelectedVariant(data.id); // Set the initial selected variant as the main product's ID
+
+        // Fetch all variant details based on the main product's variants
+        const variantIds = data.variant_ids || []; // Assuming `variant_ids` holds the IDs of related variants
+        console.log("Variant IDs to fetch:", variantIds); // Log the IDs of the variants
+        const variantRequests = variantIds.map((variantId) =>
+          fetch(`http://localhost:8080/kue/${variantId}`)
+            .then((res) => {
+              if (!res.ok) throw new Error(`Failed to fetch variant ${variantId}`);
+              return res.json();
+            })
+        );
+
+        Promise.all(variantRequests)
+          .then((results) => {
+            console.log("Fetched variant details:", results); // Log the fetched variant details
+            setVariants(results);
+          })
+          .catch((error) => console.error("Error fetching variants:", error));
+      })
+      .catch((error) => console.error("Error fetching product details:", error));
+  }, [id]);
+
+  const handleVariantSelection = (variantId) => {
+    setSelectedVariant(variantId);
+  };
+
+  if (!product || variants.length === 0) {
+    return <p>Loading...</p>;
+  }
+
+  // Find the selected variant details from the fetched data
+  const selectedProduct = variants.find((variant) => variant.id === selectedVariant);
+
+  return (
+    <div className="product-page">
+      <div className="product-content" style={{ display: 'flex' }}>
+        {/* Left side: Image */}
+        <div style={{ width: '60%', padding: '20px' }}>
+          <img src="/imgplaceholder.png" alt={product.nama} style={{ width: '100%' }} />
+        </div>
+
+        {/* Right side: Product details */}
+        <div style={{ width: '40%', padding: '20px' }}>
+          <h1>{product.nama}</h1>
+          <p className="price" style={{ marginBottom: '20px' }}>
+            Rp {selectedProduct ? selectedProduct.harga : product.harga}
+          </p>
+
+          {/* Variants grid */}
+          <div className="variant-grid" style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fit, minmax(100px, 1fr))', gap: '10px', marginBottom: '20px' }}>
+            {variants.map((variant) => (
+              <div
+                key={variant.id}
+                onClick={() => handleVariantSelection(variant.id)}
+                style={{
+                  padding: '10px',
+                  border: '1px solid #ddd',
+                  borderRadius: '5px',
+                  cursor: 'pointer',
+                  textAlign: 'center',
+                  backgroundColor: variant.id === selectedVariant ? '#ddd' : '#fff',
+                }}
+              >
+                {variant.harga}
+              </div>
+            ))}
+          </div>
+
+          {/* Description */}
+          <div style={{ borderBottom: '1px solid #ddd', paddingBottom: '20px' }}>
+            <p>{product.deskripsi}</p>
+          </div>
+        </div>
+      </div>
+    </div>
+  );
+}
+
 
 function ManageProducts() {
   const [products, setProducts] = useState([]);
@@ -122,27 +245,47 @@ function ManageProducts() {
   const [variants, setVariants] = useState([]);
 
   useEffect(() => {
-    fetch("http://localhost:8080/kue/all")
+    // Fetch the main product details by ID
+    fetch(`http://localhost:8080/kue/${id}`)
       .then((res) => {
-        if (!res.ok) throw new Error("Failed to fetch products");
+        if (!res.ok) throw new Error("Failed to fetch product details");
         return res.json();
       })
       .then((data) => {
-        setProducts(data);
+        console.log("Main product data:", data); // Check the product data structure
+        setProduct(data);
+        setSelectedVariant(data.id);
+  
+        // Check if variant_ids exists and is an array
+        const variantIds = data.variant_ids || [];
+        console.log("Variant IDs to fetch:", variantIds);
+  
+        if (variantIds.length > 0) {
+          const variantRequests = variantIds.map((variantId) =>
+            fetch(`http://localhost:8080/kue/${variantId}`)
+              .then((res) => {
+                if (!res.ok) throw new Error(`Failed to fetch variant ${variantId}`);
+                return res.json();
+              })
+              .then((data) => {
+                console.log(`Fetched variant ${variantId}:`, data);
+                return data;
+              })
+          );
+  
+          Promise.all(variantRequests)
+            .then((results) => {
+              console.log("All variant details fetched:", results);
+              setVariants(results);
+            })
+            .catch((error) => console.error("Error fetching variants:", error));
+        } else {
+          console.log("No variants found for this product.");
+        }
       })
-      .catch((error) => console.error("Error fetching products:", error));
-
-    // Fetch suppliers and variants (example URLs)
-    fetch("http://localhost:8080/supplier/all")
-      .then((res) => res.json())
-      .then((data) => setSuppliers(data))
-      .catch((error) => console.error("Error fetching suppliers:", error));
-
-    fetch("http://localhost:8080/varians/all")
-      .then((res) => res.json())
-      .then((data) => setVariants(data))
-      .catch((error) => console.error("Error fetching variants:", error));
-  }, []);
+      .catch((error) => console.error("Error fetching product details:", error));
+  }, [id]);
+  
 
   const handleInputChange = (id, field, value) => {
     setProducts((prevProducts) => {
@@ -361,12 +504,24 @@ function ManageProducts() {
                 <td>
                   <input
                     type="number"
+                    min="0.1"
+                    max="1.0"
+                    step="0.05"
                     value={product.berat}
-                    onChange={(e) => handleInputChange(product.id, "berat", parseFloat(e.target.value))}
+                    onChange={(e) => {
+                      const value = parseFloat(e.target.value);
+                      if (value >= 0.1 && value <= 1.0) {
+                        handleInputChange(product.id, "berat", value);
+                      }
+                    }}
                   />
                 </td>
-                <td>{product.supplier_id}</td>
-                <td>{product.varian_id}</td>
+                <td>
+                  {product.supplier_id}-{suppliers.find((supplier) => supplier.id === product.supplier_id)?.nama || "Unknown Supplier"}
+                </td>
+                <td>
+                  {product.varian_id}-{variants.find((variant) => variant.id === product.varian_id)?.nama || "Unknown Variant"}
+                </td>
                 <td>
                   <button
                     onClick={() => handleSave(product.id)}

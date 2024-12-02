@@ -102,3 +102,4 @@ func DeleteKue(c *gin.Context) {
 		"message": "Category deleted successfully",
 	})
 }
+

@@ -13,4 +13,5 @@ type Kue struct {
     VarianID    int     `json:"varian_id"`
 	CreatedAt	time.Time
 	UpdatedAt	time.Time
+    VarianNama  string    `json:"varian_nama"`
 }
