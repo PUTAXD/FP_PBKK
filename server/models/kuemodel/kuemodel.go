@@ -16,7 +16,8 @@ func GetAll() []entities.Kue {
 	var Kues []entities.Kue
 	for rows.Next() {
 		var Kue entities.Kue
-		if err := rows.Scan(&Kue.Id, &Kue.Nama,&Kue.Img, &Kue.Deskripsi, &Kue.Harga, &Kue.Berat, &Kue.SupplierID, &Kue.VarianID, &Kue.CreatedAt, &Kue.UpdatedAt); err != nil {
+		// if err := rows.Scan(&Kue.Id, &Kue.Nama,&Kue.Img, &Kue.Deskripsi, &Kue.Harga, &Kue.Berat, &Kue.SupplierID, &Kue.VarianID, &Kue.CreatedAt, &Kue.UpdatedAt); err != nil {
+		if err := rows.Scan(&Kue.Id, &Kue.Nama, &Kue.Deskripsi, &Kue.Harga, &Kue.Berat, &Kue.SupplierID, &Kue.VarianID); err != nil {
 			panic(err)
 		}
 
