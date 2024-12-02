@@ -162,6 +162,16 @@
   border-radius: 5px;
   cursor: pointer;
   transition: background-color 0.3s;
+  background-color: #007bff; /* Default color */
+}
+
+.save-btn.modified {
+  background-color: #28a745; /* Green when modified */
+}
+
+.save-btn:disabled {
+  background-color: #ccc; /* Gray when disabled */
+  cursor: not-allowed;
 }
 
 .mng-product-href {
