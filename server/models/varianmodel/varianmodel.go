@@ -16,7 +16,7 @@ func GetAll() []entities.Varian {
 	var varians []entities.Varian
 	for rows.Next() {
 		var varian entities.Varian
-		if err := rows.Scan(&varian.Id, &varian.Nama); err != nil {
+		if err := rows.Scan(&varian.Id, &varian.Nama, &varian.CreatedAt, &varian.UpdatedAt); err != nil {
 			panic(err)
 		}
 

@@ -16,7 +16,7 @@ func GetAll() []entities.Supplier {
 	var suppliers []entities.Supplier
 	for rows.Next() {
 		var supplier entities.Supplier
-		if err := rows.Scan(&supplier.Id, &supplier.Nama, &supplier.NomorTelfon, &supplier.Alamat); err != nil {
+		if err := rows.Scan(&supplier.Id, &supplier.Nama, &supplier.NomorTelfon, &supplier.Alamat, &supplier.CreatedAt, &supplier.UpdatedAt); err != nil {
 			panic(err)
 		}
 

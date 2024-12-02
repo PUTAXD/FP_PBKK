@@ -11,6 +11,7 @@ function App() {
           <Route path="/" element={<Dashboard />} />
           <Route path="/products" element={<Products />} />
           <Route path="/suppliers" element={<Suppliers />} />
+          <Route path="/manage-products" element={<ManageProducts />} />
         </Routes>
       </div>
     </Router>
@@ -73,23 +74,304 @@ function Products() {
 
   return (
     <div className="products">
-      <h3 className="pageTitle">Our Products</h3>
-      <input
-        type="text"
-        placeholder="Cari Produk..."
-        value={searchQuery}
-        onChange={(e) => setSearchQuery(e.target.value)}
-        className="search-bar"
-      />
+      <h2 className="pageTitle">Our Products</h2>
+      <div className="header-bar">
+        <input
+          type="text"
+          placeholder="Search Products..."
+          value={searchQuery}
+          onChange={(e) => setSearchQuery(e.target.value)}
+          className="search-bar"
+        />
+        <button className="mng-product-btn"><a className="mng-product-href" href="/manage-products">Manage Products</a></button>
+      </div>
       <div className="grid">
         {filteredProducts.map((product) => (
           <div key={product.id} className="card">
-            {/* <img src={product.image} alt={product.name} className="card-image" /> */}
-            <h2>{product.nama}</h2>
-            <p>{product.deskripsi}</p>
-            <p className="price">Rp {product.harga}</p>
+            <div className="card-content">
+              <div className="card-image">
+                <img src="/imgplaceholder.png" alt={product.nama} />
+              </div>
+              <div className="card-details">
+                <h2>{product.nama}</h2>
+                <p>{product.deskripsi}</p>
+                <p className="price">Rp {product.harga}</p>
+              </div>
+            </div>
           </div>
         ))}
+      </div>
+    </div>
+  );
+}
+
+function ManageProducts() {
+  const [products, setProducts] = useState([]);
+  const [searchQuery, setSearchQuery] = useState("");
+  const [isModified, setIsModified] = useState(false);
+  const [newProduct, setNewProduct] = useState({
+    nama: "",
+    deskripsi: "",
+    harga: "",
+    berat: "",
+    supplierID: "",
+    varianID: "",
+  });
+  const [isAdding, setIsAdding] = useState(false);
+
+  useEffect(() => {
+    fetch("http://localhost:8080/kue/all")
+      .then((res) => {
+        if (!res.ok) throw new Error("Failed to fetch products");
+        return res.json();
+      })
+      .then((data) => {
+        setProducts(data);
+      })
+      .catch((error) => console.error("Error fetching products:", error));
+  }, []);
+
+  // Handle updates to product fields
+  const handleInputChange = (id, field, value) => {
+    setProducts((prevProducts) => {
+      const updatedProducts = prevProducts.map((product) => {
+        if (product.id === id) {
+          return { ...product, [field]: value };
+        }
+        return product;
+      });
+      return updatedProducts;
+    });
+    setIsModified(true);
+  };
+
+  // Handle Add Button click
+  const handleAdd = () => {
+    setIsAdding(true);
+  };
+
+  // Handle Confirm Add Button click
+  const handleConfirmAdd = () => {
+    fetch("http://localhost:8080/kue/add", {
+      method: "POST",
+      headers: {
+        "Content-Type": "application/json",
+      },
+      body: JSON.stringify(newProduct),
+    })
+      .then((res) => {
+        if (!res.ok) throw new Error("Failed to add product");
+        return res.json();
+      })
+      .then((data) => {
+        setProducts((prevProducts) => [...prevProducts, data]);
+        setNewProduct({
+          nama: "",
+          deskripsi: "",
+          harga: "",
+          berat: "",
+          supplierID: "",
+          varianID: "",
+        });
+        setIsAdding(false);
+      })
+      .catch((error) => console.error("Error adding product:", error));
+  };
+
+    // Handle deleting a product
+    const handleDelete = (id) => {
+      fetch(`http://localhost:8080/kue/delete/${id}`, {
+        method: "DELETE",
+      })
+        .then((res) => {
+          if (!res.ok) throw new Error("Failed to delete product");
+          return res.json();
+        })
+        .then(() => {
+          setProducts((prevProducts) => prevProducts.filter((product) => product.id !== id));
+        })
+        .catch((error) => console.error("Error deleting product:", error));
+    };
+
+  // Handle Save Button click
+  const handleSave = () => {
+    const updatedProducts = products.map((product) => ({
+      ...product,
+      updated_at: new Date().toISOString(),
+    }));
+
+    fetch("http://localhost:8080/kue/update", {
+      method: "POST",
+      headers: {
+        "Content-Type": "application/json",
+      },
+      body: JSON.stringify(updatedProducts),
+    })
+      .then((res) => {
+        if (!res.ok) throw new Error("Failed to update products");
+        return res.json();
+      })
+      .then((data) => {
+        console.log("Products updated:", data);
+        setIsModified(false);
+      })
+      .catch((error) => console.error("Error updating products:", error));
+  };
+
+  // Filtered products based on search query
+  const filteredProducts = products.filter((product) => {
+    const queryWords = searchQuery.toLowerCase().split(/\s+/);
+    return queryWords.every((word) => product.nama.toLowerCase().includes(word));
+  });
+
+  return (
+    <div className="manage-products">
+      <h2 className="pageTitle">Manage Products</h2>
+      <div className="header-bar">
+        <input
+          type="text"
+          placeholder="Search Products..."
+          value={searchQuery}
+          onChange={(e) => setSearchQuery(e.target.value)}
+          className="search-bar"
+        />
+        <button
+          className="add-btn"
+          onClick={handleAdd}
+          style={{ backgroundColor: "#2196F3", cursor: "pointer" }}
+        >
+          Add
+        </button>
+        <button
+          className="save-btn"
+          disabled={!isModified}
+          onClick={handleSave}
+          style={{
+            backgroundColor: isModified ? "#4CAF50" : "#d3d3d3",
+            cursor: isModified ? "pointer" : "not-allowed",
+          }}
+        >
+          Save
+        </button>
+      </div>
+      {isAdding && (
+        <div className="add-product-form">
+          <table className="new-product-table">
+            <thead>
+              <tr>
+                <th>Nama</th>
+                <th>Deskripsi</th>
+                <th>Harga</th>
+                <th>Berat</th>
+                <th>Supplier ID</th>
+                <th>Varian ID</th>
+              </tr>
+            </thead>
+            <tbody>
+              <tr>
+                <td>
+                  <input
+                    type="text"
+                    value={newProduct.nama}
+                    onChange={(e) => setNewProduct({ ...newProduct, nama: e.target.value })}
+                  />
+                </td>
+                <td>
+                  <input
+                    type="text"
+                    value={newProduct.deskripsi}
+                    onChange={(e) => setNewProduct({ ...newProduct, deskripsi: e.target.value })}
+                  />
+                </td>
+                <td>
+                  <input
+                    type="number"
+                    value={newProduct.harga}
+                    onChange={(e) => setNewProduct({ ...newProduct, harga: parseInt(e.target.value, 10) })}
+                  />
+                </td>
+                <td>
+                  <input
+                    type="number"
+                    value={newProduct.berat}
+                    onChange={(e) => setNewProduct({ ...newProduct, berat: parseFloat(e.target.value) })}
+                  />
+                </td>
+                <td>
+                  <input
+                    type="text"
+                    value={newProduct.supplierID}
+                    onChange={(e) => setNewProduct({ ...newProduct, supplierID: e.target.value })}
+                  />
+                </td>
+                <td>
+                  <input
+                    type="text"
+                    value={newProduct.varianID}
+                    onChange={(e) => setNewProduct({ ...newProduct, varianID: e.target.value })}
+                  />
+                </td>
+              </tr>
+            </tbody>
+          </table>
+          <button className="confirm-add-btn" onClick={handleConfirmAdd} style={{ marginTop: "10px" }}>
+            Confirm Add
+          </button>
+        </div>
+      )}
+      <div className="products-table-div">
+      <table className="products-table">
+        <thead>
+          <tr>
+            <th>ID</th>
+            <th>Nama</th>
+            <th>Deskripsi</th>
+            <th>Harga</th>
+            <th>Berat</th>
+            <th></th>
+          </tr>
+        </thead>
+        <tbody>
+          {filteredProducts.map((product) => (
+            <tr key={product.id}>
+              <td>{product.id}</td>
+              <td>
+                <input
+                  type="text"
+                  value={product.nama}
+                  onChange={(e) => handleInputChange(product.id, "nama", e.target.value)}
+                />
+              </td>
+              <td>
+                <input
+                  type="text"
+                  value={product.deskripsi}
+                  onChange={(e) => handleInputChange(product.id, "deskripsi", e.target.value)}
+                />
+              </td>
+              <td>
+                <input
+                  type="number"
+                  value={product.harga}
+                  onChange={(e) => handleInputChange(product.id, "harga", parseInt(e.target.value, 10))}
+                />
+              </td>
+              <td>
+                <input
+                  type="number"
+                  value={product.berat}
+                  onChange={(e) => handleInputChange(product.id, "berat", parseFloat(e.target.value))}
+                />
+              </td>
+              <td>
+                <button onClick={() => handleDelete(product.id)} className="delete-btn">
+                  Delete
+                </button>
+              </td>
+            </tr>
+          ))}
+        </tbody>
+      </table>
       </div>
     </div>
   );
@@ -107,10 +389,10 @@ function Suppliers() {
 
   return (
     <div className="suppliers">
-      <h1>Our Suppliers</h1>
+      <h2 className="pageTitle">Our Suppliers</h2>
       {suppliers.map((supplier) => (
         <div key={supplier.id} className="supplier">
-          <h2>{supplier.nama}</h2>
+          <p className="namaSupplier">{supplier.nama}</p>
           <p>{supplier.nomor_telfon}</p>
           <p className="address">{supplier.alamat}</p>
         </div>

@@ -1,5 +1,4 @@
--- Active: 1701326279058@@127.0.0.1@3306@db_kue
-SET FOREIGN_KEY_CHECKS = 0;
+-- Active: 1701326279058@@127.0.0.1@3306@db_kueSET FOREIGN_KEY_CHECKS = 0;
 
 TRUNCATE TABLE Kue;
 TRUNCATE TABLE Supplier;
@@ -11,12 +10,16 @@ CREATE TABLE IF NOT EXISTS Supplier (
     id INT AUTO_INCREMENT PRIMARY KEY,
     nama VARCHAR(255) NOT NULL,
     nomor_telfon VARCHAR(15),
-    alamat TEXT
+    alamat TEXT,
+    created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
+    updated_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP
 );
 
 CREATE TABLE IF NOT EXISTS Varian (
     id INT AUTO_INCREMENT PRIMARY KEY,
-    nama VARCHAR(255) NOT NULL
+    nama VARCHAR(255) NOT null,
+    created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
+    updated_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP
 );
 
 CREATE TABLE IF NOT EXISTS Kue (
@@ -27,6 +30,8 @@ CREATE TABLE IF NOT EXISTS Kue (
     berat FLOAT,
     supplier_id INT,
     varian_id INT,
+    created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
+    updated_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP,
     FOREIGN KEY (supplier_id) REFERENCES Supplier(id),
     FOREIGN KEY (varian_id) REFERENCES Varian(id)
 );
@@ -78,5 +83,13 @@ INSERT INTO Kue (nama, deskripsi, harga, berat, supplier_id, varian_id) VALUES
 ('Gem Rose Cookies', 'Kue kering warna-warni dengan rasa manis.', 50000, 0.25, 2, 1),
 ('Emping Pedas Manis', 'Camilan emping dengan bumbu pedas manis.', 50000, 0.3, 2, 1);
 
+UPDATE Kue
+SET berat = CASE
+  WHEN RAND() < 0.4 THEN 0.15
+  WHEN RAND() < 0.6 THEN 0.2
+  WHEN RAND() < 0.8 THEN 0.25
+  ELSE 0.3
+END;
 
-
+UPDATE Kue
+SET harga = FLOOR(RAND() * (36) + 20) * 1000;
