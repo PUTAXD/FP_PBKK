@@ -128,8 +128,14 @@
   border-radius: 5px;
 }
 
+.mng-product-href {
+  flex: 0 0 20%; /* This makes the anchor tag take up 20% of the space */
+  text-decoration: none;
+  color: white;
+}
+
 .mng-product-btn {
-  flex: 0 0 25%;
+  width: 100%; /* Make the button fill the entire width of the anchor */
   padding: 10px;
   border: none;
   background-color: #007bff;
@@ -172,11 +178,6 @@
 .save-btn:disabled {
   background-color: #ccc; /* Gray when disabled */
   cursor: not-allowed;
-}
-
-.mng-product-href {
-  text-decoration: none;
-  color: white;
 }
 
 .manage-products .grid {

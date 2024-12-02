@@ -83,7 +83,7 @@ function Products() {
           onChange={(e) => setSearchQuery(e.target.value)}
           className="search-bar"
         />
-        <button className="mng-product-btn"><a className="mng-product-href" href="/manage-products">Manage Products</a></button>
+        <a className="mng-product-href" href="/manage-products"><button className="mng-product-btn">Manage Products</button></a>
       </div>
       <div className="grid">
         {filteredProducts.map((product) => (
