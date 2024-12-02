@@ -54,13 +54,13 @@ function Products() {
   const [searchQuery, setSearchQuery] = useState("");
 
   useEffect(() => {
+    // Fetch products
     fetch("http://localhost:8080/kue/all")
       .then((res) => {
         if (!res.ok) throw new Error("Failed to fetch products");
         return res.json();
       })
       .then((data) => {
-        console.log("Fetched products:", data);
         setProducts(data);
       })
       .catch((error) => console.error("Error fetching products:", error));
@@ -114,10 +114,12 @@ function ManageProducts() {
     deskripsi: "",
     harga: "",
     berat: "",
-    supplierID: "",
-    varianID: "",
+    supplier_id: "",
+    varian_id: "",
   });
   const [isAdding, setIsAdding] = useState(false);
+  const [suppliers, setSuppliers] = useState([]);
+  const [variants, setVariants] = useState([]);
 
   useEffect(() => {
     fetch("http://localhost:8080/kue/all")
@@ -129,9 +131,19 @@ function ManageProducts() {
         setProducts(data);
       })
       .catch((error) => console.error("Error fetching products:", error));
+
+    // Fetch suppliers and variants (example URLs)
+    fetch("http://localhost:8080/supplier/all")
+      .then((res) => res.json())
+      .then((data) => setSuppliers(data))
+      .catch((error) => console.error("Error fetching suppliers:", error));
+
+    fetch("http://localhost:8080/varians/all")
+      .then((res) => res.json())
+      .then((data) => setVariants(data))
+      .catch((error) => console.error("Error fetching variants:", error));
   }, []);
 
-  // Handle updates to product fields
   const handleInputChange = (id, field, value) => {
     setProducts((prevProducts) => {
       const updatedProducts = prevProducts.map((product) => {
@@ -145,12 +157,10 @@ function ManageProducts() {
     setIsModified(true);
   };
 
-  // Handle Add Button click
   const handleAdd = () => {
     setIsAdding(true);
   };
 
-  // Handle Confirm Add Button click
   const handleConfirmAdd = () => {
     fetch("http://localhost:8080/kue/add", {
       method: "POST",
@@ -170,55 +180,47 @@ function ManageProducts() {
           deskripsi: "",
           harga: "",
           berat: "",
-          supplierID: "",
-          varianID: "",
+          supplier_id: "",
+          varian_id: "",
         });
         setIsAdding(false);
+        window.location.reload();
       })
       .catch((error) => console.error("Error adding product:", error));
   };
 
-    // Handle deleting a product
-    const handleDelete = (id) => {
-      fetch(`http://localhost:8080/kue/delete/${id}`, {
-        method: "DELETE",
+  const handleDelete = (id) => {
+    fetch(`http://localhost:8080/kue/delete/${id}`, {
+      method: "DELETE",
+    })
+      .then((res) => {
+        if (!res.ok) throw new Error("Failed to delete product");
+        return res.json();
       })
-        .then((res) => {
-          if (!res.ok) throw new Error("Failed to delete product");
-          return res.json();
-        })
-        .then(() => {
-          setProducts((prevProducts) => prevProducts.filter((product) => product.id !== id));
-        })
-        .catch((error) => console.error("Error deleting product:", error));
-    };
+      .then(() => {
+        setProducts((prevProducts) => prevProducts.filter((product) => product.id !== id));
+      })
+      .catch((error) => console.error("Error deleting product:", error));
+  };
 
-  // Handle Save Button click
   const handleSave = () => {
-    const updatedProducts = products.map((product) => ({
-      ...product,
-      updated_at: new Date().toISOString(),
-    }));
-
     fetch("http://localhost:8080/kue/update", {
       method: "POST",
       headers: {
         "Content-Type": "application/json",
       },
-      body: JSON.stringify(updatedProducts),
+      body: JSON.stringify(products),
     })
       .then((res) => {
         if (!res.ok) throw new Error("Failed to update products");
         return res.json();
       })
-      .then((data) => {
-        console.log("Products updated:", data);
+      .then(() => {
         setIsModified(false);
       })
       .catch((error) => console.error("Error updating products:", error));
   };
 
-  // Filtered products based on search query
   const filteredProducts = products.filter((product) => {
     const queryWords = searchQuery.toLowerCase().split(/\s+/);
     return queryWords.every((word) => product.nama.toLowerCase().includes(word));
@@ -254,67 +256,60 @@ function ManageProducts() {
           Save
         </button>
       </div>
+
       {isAdding && (
         <div className="add-product-form">
-          <table className="new-product-table">
-            <thead>
-              <tr>
-                <th>Nama</th>
-                <th>Deskripsi</th>
-                <th>Harga</th>
-                <th>Berat</th>
-                <th>Supplier ID</th>
-                <th>Varian ID</th>
-              </tr>
-            </thead>
-            <tbody>
-              <tr>
-                <td>
-                  <input
-                    type="text"
-                    value={newProduct.nama}
-                    onChange={(e) => setNewProduct({ ...newProduct, nama: e.target.value })}
-                  />
-                </td>
-                <td>
-                  <input
-                    type="text"
-                    value={newProduct.deskripsi}
-                    onChange={(e) => setNewProduct({ ...newProduct, deskripsi: e.target.value })}
-                  />
-                </td>
-                <td>
-                  <input
-                    type="number"
-                    value={newProduct.harga}
-                    onChange={(e) => setNewProduct({ ...newProduct, harga: parseInt(e.target.value, 10) })}
-                  />
-                </td>
-                <td>
-                  <input
-                    type="number"
-                    value={newProduct.berat}
-                    onChange={(e) => setNewProduct({ ...newProduct, berat: parseFloat(e.target.value) })}
-                  />
-                </td>
-                <td>
-                  <input
-                    type="text"
-                    value={newProduct.supplierID}
-                    onChange={(e) => setNewProduct({ ...newProduct, supplierID: e.target.value })}
-                  />
-                </td>
-                <td>
-                  <input
-                    type="text"
-                    value={newProduct.varianID}
-                    onChange={(e) => setNewProduct({ ...newProduct, varianID: e.target.value })}
-                  />
-                </td>
-              </tr>
-            </tbody>
-          </table>
-          <button className="confirm-add-btn" onClick={handleConfirmAdd} style={{ marginTop: "10px" }}>
+          <input
+            type="text"
+            placeholder="Nama"
+            value={newProduct.nama}
+            onChange={(e) => setNewProduct((prev) => ({ ...prev, nama: e.target.value }))}
+          />
+          <input
+            type="text"
+            placeholder="Deskripsi"
+            value={newProduct.deskripsi}
+            onChange={(e) => setNewProduct((prev) => ({ ...prev, deskripsi: e.target.value }))}
+          />
+          <input
+            type="number"
+            placeholder="Harga"
+            value={newProduct.harga}
+            onChange={(e) => setNewProduct((prev) => ({ ...prev, harga: Number(e.target.value) }))}
+          />
+          <input
+            type="number"
+            placeholder="Berat"
+            value={newProduct.berat}
+            onChange={(e) => setNewProduct((prev) => ({ ...prev, berat: Number(e.target.value) }))}
+          />
+          <select
+            value={newProduct.supplier_id}
+            onChange={(e) => setNewProduct((prev) => ({ ...prev, supplier_id: Number(e.target.value) }))}
+          >
+            <option value="">Select Supplier</option>
+            {suppliers.map((supplier) => (
+              <option key={supplier.id} value={supplier.id}>
+                {supplier.id}-{supplier.nama}
+              </option>
+            ))}
+          </select>
+          <select
+            value={newProduct.varian_id}
+            onChange={(e) => setNewProduct((prev) => ({ ...prev, varian_id: Number(e.target.value) }))}
+          >
+            <option value="">Select Varian</option>
+            {variants.map((variant) => (
+              <option key={variant.id} value={variant.id}>
+                {variant.id}-{variant.nama}
+              </option>
+            ))}
+          </select>
+          <button
+            onClick={handleConfirmAdd}
+            className="confirm-add-btn"
+            style={{ marginTop: "10px" }}
+          >
             Confirm Add
           </button>
         </div>
@@ -328,6 +323,8 @@ function ManageProducts() {
             <th>Deskripsi</th>
             <th>Harga</th>
             <th>Berat</th>
+            <th>Supplier ID</th>
+            <th>Varian ID</th>
             <th></th>
           </tr>
         </thead>
@@ -363,6 +360,8 @@ function ManageProducts() {
                   onChange={(e) => handleInputChange(product.id, "berat", parseFloat(e.target.value))}
                 />
               </td>
+              <td>{product.supplier_id}</td>
+              <td>{product.varian_id}</td>
               <td>
                 <button onClick={() => handleDelete(product.id)} className="delete-btn">
                   Delete

@@ -30,10 +30,13 @@ func GetAll() []entities.Kue {
 func Create(kue entities.Kue) bool {
 	// Menyisipkan data ke dalam tabel Kue
 	result, err := config.DB.Exec(`
-		INSERT INTO Kue (nama, img, deskripsi, harga, berat, supplier_id, varian_id, createdAt, updatedAt)
-		VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?)`,
+		INSERT INTO Kue (nama, deskripsi, harga, berat, supplier_id, varian_id, created_at, updated_at)
+		VALUES (?, ?, ?, ?, ?, ?, ?, ?)`,
+		// `
+		// INSERT INTO Kue (nama, img, deskripsi, harga, berat, supplier_id, varian_id, created_at, updated_at)
+		// VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?)`,
 		kue.Nama,
-		kue.Img,
+		// kue.Img,
 		kue.Deskripsi,
 		kue.Harga,
 		kue.Berat,
@@ -62,7 +65,10 @@ func Detail(id int) entities.Kue {
 
 	var Kue entities.Kue
 
-	if err := row.Scan(&Kue.Id, &Kue.Nama, &Kue.Img, &Kue.Deskripsi, &Kue.Harga, &Kue.Berat, &Kue.SupplierID, &Kue.VarianID, &Kue.CreatedAt, &Kue.UpdatedAt); err != nil {
+	// if err := row.Scan(&Kue.Id, &Kue.Nama, &Kue.Img, &Kue.Deskripsi, &Kue.Harga, &Kue.Berat, &Kue.SupplierID, &Kue.VarianID, &Kue.CreatedAt, &Kue.UpdatedAt); err != nil {
+	// 	panic(err)
+	// }
+	if err := row.Scan(&Kue.Id, &Kue.Nama, &Kue.Deskripsi, &Kue.Harga, &Kue.Berat, &Kue.SupplierID, &Kue.VarianID, &Kue.CreatedAt, &Kue.UpdatedAt); err != nil {
 		panic(err)
 	}
 
@@ -76,7 +82,7 @@ func Update(id int, kue entities.Kue) bool {
 		UPDATE Kue SET nama = ?, img = ?, deskripsi = ?, harga = ?, berat = ?, supplier_id = ?, varian_id = ?, updatedAt = ?
 		WHERE id = ?`,
 		kue.Nama,
-		kue.Img,
+		// kue.Img,
 		kue.Deskripsi,
 		kue.Harga,
 		kue.Berat,
