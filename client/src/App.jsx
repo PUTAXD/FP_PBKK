@@ -333,48 +333,20 @@ function ManageProducts() {
 
   useEffect(() => {
     // Fetch the main product details by ID
-    fetch(`http://localhost:8080/kue/${id}`)
+    fetch(`http://localhost:8080/kue/all`)
       .then((res) => {
         if (!res.ok) throw new Error("Failed to fetch product details");
         return res.json();
       })
       .then((data) => {
         console.log("Main product data:", data); // Check the product data structure
-        setProduct(data);
-        setSelectedVariant(data.id);
-
-        // Check if variant_ids exists and is an array
-        const variantIds = data.variant_ids || [];
-        console.log("Variant IDs to fetch:", variantIds);
-
-        if (variantIds.length > 0) {
-          const variantRequests = variantIds.map((variantId) =>
-            fetch(`http://localhost:8080/kue/${variantId}`)
-              .then((res) => {
-                if (!res.ok)
-                  throw new Error(`Failed to fetch variant ${variantId}`);
-                return res.json();
-              })
-              .then((data) => {
-                console.log(`Fetched variant ${variantId}:`, data);
-                return data;
-              })
-          );
-
-          Promise.all(variantRequests)
-            .then((results) => {
-              console.log("All variant details fetched:", results);
-              setVariants(results);
-            })
-            .catch((error) => console.error("Error fetching variants:", error));
-        } else {
-          console.log("No variants found for this product.");
-        }
+        setProducts(data);
+        // setSelectedVariant(data.id);
       })
       .catch((error) =>
         console.error("Error fetching product details:", error)
       );
-  }, [id]);
+  }, []);
 
   const handleInputChange = (id, field, value) => {
     setProducts((prevProducts) => {
