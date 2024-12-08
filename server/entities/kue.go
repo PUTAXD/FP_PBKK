@@ -5,7 +5,7 @@ import "time"
 type Kue struct {
     Id			int     `json:"id"`
     Nama        string  `json:"nama"`
-	// Img       string  `json:"image"`
+	Img       string  `json:"image"`
     Deskripsi   string  `json:"deskripsi"`
     Harga       int     `json:"harga"`
     Berat       float64 `json:"berat"`

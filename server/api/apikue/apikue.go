@@ -23,6 +23,8 @@ func AddKue(c *gin.Context) {
 
     kue.CreatedAt = time.Now() // Untuk menyimpan waktu saat ini
 	kue.UpdatedAt = time.Now()
+
+	
 	// Bind JSON body dari request ke struct Category
 	if err := c.ShouldBindJSON(&kue); err != nil {
 		c.JSON(http.StatusBadRequest, gin.H{"error": err.Error()})
