@@ -43,13 +43,10 @@ func GetAll() []entities.Kue {
 func Create(kue entities.Kue) bool {
 	// Menyisipkan data ke dalam tabel Kue
 	result, err := config.DB.Exec(`
-		INSERT INTO Kue (nama, deskripsi, harga, berat, supplier_id, varian_id, created_at, updated_at)
-		VALUES (?, ?, ?, ?, ?, ?, ?, ?)`,
-		// `
-		// INSERT INTO Kue (nama, img, deskripsi, harga, berat, supplier_id, varian_id, created_at, updated_at)
-		// VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?)`,
+		INSERT INTO Kue (nama, img, deskripsi, harga, berat, supplier_id, varian_id, created_at, updated_at)
+		VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?)`,
 		kue.Nama,
-		// kue.Img,
+		kue.Img,
 		kue.Deskripsi,
 		kue.Harga,
 		kue.Berat,
