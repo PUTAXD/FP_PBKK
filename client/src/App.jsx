@@ -1,7 +1,8 @@
 import React from "react";
 import { BrowserRouter as Router, Route, Routes } from "react-router-dom";
+import "./index.css";
 import "./App.css";
-import Navbar from "./Pages/Components/Navbar";
+import NavbarComponent from "./Pages/Components/NavbarComponent";
 import Dashboard from "./Pages/Dashboard";
 import ProductsListing from "./Pages/ProductsListing";
 import ProductPage from "./Pages/ProductPage";
@@ -13,7 +14,7 @@ function App() {
   return (
     <Router>
       <div>
-        <Navbar />
+        <NavbarComponent />
         <Routes>
           <Route path="/" element={<Dashboard />} />
           <Route path="/products" element={<ProductsListing />} />

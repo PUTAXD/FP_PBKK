@@ -250,7 +250,7 @@ function ManageProducts() {
         product.nama.toLowerCase().includes(word)
       );
     } else {
-      handleRefresh();
+      // handleRefresh();
     }
   });
 
