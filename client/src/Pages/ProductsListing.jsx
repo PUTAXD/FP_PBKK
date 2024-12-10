@@ -25,24 +25,6 @@ function ProductsListing() {
       );
     });
   
-    // Group products by name and calculate price range
-    const groupedProducts = filteredProducts.reduce((acc, product) => {
-      const existing = acc.find((p) => p.nama === product.nama);
-      if (existing) {
-        existing.minPrice = Math.min(existing.minPrice, product.harga);
-        existing.maxPrice = Math.max(existing.maxPrice, product.harga);
-        existing.variantCount += 1;
-      } else {
-        acc.push({
-          ...product,
-          minPrice: product.harga,
-          maxPrice: product.harga,
-          variantCount: 1, // Keep track of how many variants exist
-        });
-      }
-      return acc;
-    }, []);
-  
     return (
       <div className="products">
         <h2 className="pageTitle">Our Products</h2>
@@ -59,7 +41,7 @@ function ProductsListing() {
           </a>
         </div>
         <div className="grid">
-          {groupedProducts.map((product) => (
+          {filteredProducts.map((product) => (
             <a
               key={product.id}
               href={`/products/${product.id}`}
@@ -68,7 +50,7 @@ function ProductsListing() {
               <div className="card">
                 <div className="card-content">
                   <div className="card-image">
-                    <img src="/imgplaceholder.png" alt={product.nama} />
+                    <img src={product.img} alt={product.nama} />
                   </div>
                   <div className="card-details">
                     <h2>{product.nama}</h2>
@@ -77,11 +59,7 @@ function ProductsListing() {
                         ? product.deskripsi.slice(0, 60) + "..."
                         : product.deskripsi}
                     </p>
-                    <p className="price">
-                      {product.variantCount > 1
-                        ? `Rp ${product.minPrice} ~ Rp ${product.maxPrice}`
-                        : `Rp ${product.minPrice}`}
-                    </p>
+                    <p className="price">Rp {product.harga}</p>
                   </div>
                 </div>
               </div>

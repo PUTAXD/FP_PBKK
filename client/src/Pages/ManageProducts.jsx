@@ -1,4 +1,5 @@
 import React, { useEffect, useState } from "react";
+
 function ManageProducts() {
     const [products, setProducts] = useState([]);
     const [modifiedProducts, setModifiedProducts] = useState({});
@@ -10,10 +11,24 @@ function ManageProducts() {
       berat: "",
       supplier_id: "",
       varian_id: "",
+      img: "",
     });
     const [isAdding, setIsAdding] = useState(false);
     const [suppliers, setSuppliers] = useState([]);
     const [variants, setVariants] = useState([]);
+    const [gambar, setGambar] = useState(null);
+    const [gambarPreview, setGambarPreview] = useState(null);
+    const [uploadStatus, setUploadStatus] = useState("");
+  
+    const handleFileChange = (e) => {
+      const file = e.target.files[0];
+      if (file) {
+        const imageUrl = URL.createObjectURL(file);
+        setGambar(file);
+        setGambarPreview(imageUrl);
+      }
+    };
+    
   
     useEffect(() => {
       fetch("http://localhost:8080/kue/all")
@@ -37,6 +52,16 @@ function ManageProducts() {
         .then((data) => setVariants(data))
         .catch((error) => console.error("Error fetching variants:", error));
     }, []);
+
+    const getSupplierName = (id) => {
+      const supplier = suppliers.find((supplier) => supplier.id === id);
+      return supplier ? supplier.nama : "Unknown Supplier";
+    };
+
+    const getVariantName = (id) => {
+      const variant = variants.find((variant) => variant.id === id);
+      return variant ? variant.nama : "Unknown Variant";
+    };
   
     const handleInputChange = (id, field, value) => {
       setProducts((prevProducts) => {
@@ -62,33 +87,73 @@ function ManageProducts() {
       setIsAdding(true);
     };
   
-    const handleConfirmAdd = () => {
-      fetch("http://localhost:8080/kue/add", {
-        method: "POST",
-        headers: {
-          "Content-Type": "application/json",
-        },
-        body: JSON.stringify(newProduct),
-      })
-        .then((res) => {
-          if (!res.ok) throw new Error("Failed to add product");
-          return res.json();
-        })
-        .then((data) => {
-          setProducts((prevProducts) => [...prevProducts, data]);
-          setNewProduct({
-            nama: "",
-            deskripsi: "",
-            harga: "",
-            berat: "",
-            supplier_id: "",
-            varian_id: "",
+    const handleConfirmAdd = async () => {
+      let imagename = "";
+      // Step 1: Upload the image and get the file path
+      if (gambar) {
+        const formData = new FormData();
+        formData.append("gambar", gambar);
+    
+        try {
+          const uploadResponse = await fetch("http://localhost:8080/upload", {
+            method: "POST",
+            body: formData,
           });
-          setIsAdding(false);
-        })
-        .catch((error) => console.error("Error adding product:", error));
+    
+          const uploadData = await uploadResponse.json();
+          if (uploadData.filePath) {
+            // Extract the filename from the filePath
+            const filename = uploadData.filePath.split('/').pop();
+            // Update the newProduct state with the new image path
+            imagename = "/images/" + filename
+            setNewProduct((prev) => ({
+              ...prev,
+              img: imagename,
+            }));
+          } else {
+            // Handle the case where filePath is not returned
+            console.error("File path not returned from the server");
+          }
+        } catch (error) {
+          console.error("Error uploading image:", error);
+        }
+      }
+    
+      // Step 2: Inject the img field manually into newProduct before sending
+      const updatedProduct = {
+        ...newProduct,
+        img: imagename, // Set the img field with the uploaded image path
+      };
+
+      // Step 3: Add the product with the updated object
+      try {
+        const response = await fetch("http://localhost:8080/kue/add", {
+          method: "POST",
+          headers: {
+            "Content-Type": "application/json",
+          },
+          body: JSON.stringify(updatedProduct),
+        });
+
+        if (!response.ok) throw new Error("Failed to add product");
+
+        const data = await response.json();
+        setProducts((prevProducts) => [...prevProducts, data]);
+        setNewProduct({
+          nama: "",
+          deskripsi: "",
+          harga: "",
+          berat: "",
+          supplier_id: "",
+          varian_id: "",
+          img: "", // Reset img after product is added
+        });
+        setIsAdding(false);
+      } catch (error) {
+        console.error("Error adding product:", error);
+      }
     };
-  
+    
     const handleDelete = (id) => {
       fetch(`http://localhost:8080/kue/delete/${id}`, {
         method: "DELETE",
@@ -163,6 +228,12 @@ function ManageProducts() {
               placeholder="Nama"
               value={newProduct.nama}
               onChange={(e) => setNewProduct((prev) => ({ ...prev, nama: e.target.value }))}
+            />
+            <input
+              type="file"
+              accept="image/*"
+              onChange={handleFileChange}
+              required
             />
             <input
               type="text"
@@ -259,8 +330,8 @@ function ManageProducts() {
                       onChange={(e) => handleInputChange(product.id, "berat", parseFloat(e.target.value))}
                     />
                   </td>
-                  <td>{product.supplier_id}</td>
-                  <td>{product.varian_id}</td>
+                  <td>{product.supplier_id} - {getSupplierName(product.supplier_id)}</td>
+                  <td>{product.varian_id} - {getVariantName(product.varian_id)}</td>
                   <td>
                     <button
                       onClick={() => handleSave(product.id)}

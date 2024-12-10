@@ -21,8 +21,8 @@ function ProductPage() {
           setSelectedVariant(data.id); // Set the initial selected variant as the main product's ID
   
           // Fetch all variant details based on the main product's variants
-          const variantIds = data.variant_ids || []; // Assuming `variant_ids` holds the IDs of related variants
-          console.log("Variant IDs to fetch:", variantIds); // Log the IDs of the variants
+          const variantIds = data.variant_ids || [];
+          console.log("Variant IDs to fetch:", variantIds);
           const variantRequests = variantIds.map((variantId) =>
             fetch(`http://localhost:8080/kue/${variantId}`).then((res) => {
               if (!res.ok)
@@ -61,7 +61,7 @@ function ProductPage() {
           {/* Left side: Image */}
           <div style={{ width: "60%", padding: "20px" }}>
             <img
-              src="/imgplaceholder.png"
+              src={product.img}
               alt={product.nama}
               style={{ width: "100%" }}
             />
