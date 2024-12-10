@@ -17,10 +17,10 @@ func ConnectDB() {
 	}
 
 	// Check if the database is reachable
-    err = db.Ping()
-    if err != nil {
-        panic(err)
-    }
+	err = db.Ping()
+	if err != nil {
+		panic(err)
+	}
 
 	DB = db
 

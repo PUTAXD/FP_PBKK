@@ -23,12 +23,22 @@ function ManageProducts() {
     const handleFileChange = (e) => {
       const file = e.target.files[0];
       if (file) {
-        const imageUrl = URL.createObjectURL(file);
         setGambar(file);
-        setGambarPreview(imageUrl);
       }
     };
+
+    const handleFileUpdate= (productId, e) => {
+      const file = e.target.files[0];
+      if (file) {
+        setGambar(file); // Update the file state
     
+        // Mark the product as modified
+        setModifiedProducts((prevModified) => ({
+          ...prevModified,
+          [productId]: true, // Set the modified status to true for the specific product
+        }));
+      }
+    };
   
     useEffect(() => {
       fetch("http://localhost:8080/kue/all")
@@ -153,7 +163,7 @@ function ManageProducts() {
         console.error("Error adding product:", error);
       }
     };
-    
+
     const handleDelete = (id) => {
       fetch(`http://localhost:8080/kue/delete/${id}`, {
         method: "DELETE",
@@ -168,31 +178,66 @@ function ManageProducts() {
         .catch((error) => console.error("Error deleting product:", error));
     };
   
-    const handleSave = (id) => {
+    const handleSave = async (id) => {
       const productToSave = products.find((product) => product.id === id);
     
-      fetch(`http://localhost:8080/kue/update/${id}`, {
-        method: "PUT",
-        headers: {
-          "Content-Type": "application/json",
-        },
-        body: JSON.stringify(productToSave),
-      })
-        .then((res) => {
-          if (!res.ok) throw new Error("Failed to update product");
-          return res.json();
-        })
-        .then(() => {
-          // Mark as saved and remove the modification status
-          setModifiedProducts((prevModified) => ({
-            ...prevModified,
-            [id]: false, // Reset the modified status for this product
-          }));
-        })
-        .catch((error) => {
-          console.error("Error updating product:", error);
+      // Step 1: Upload the image if a new image file was selected
+      let imagename = productToSave.img; // Default to the existing image
+      if (gambar) { // Assuming `gambar` contains the file selected for upload
+        const formData = new FormData();
+        formData.append("gambar", gambar);
+    
+        try {
+          const uploadResponse = await fetch("http://localhost:8080/upload", {
+            method: "POST",
+            body: formData,
+          });
+    
+          const uploadData = await uploadResponse.json();
+          if (uploadData.filePath) {
+            const filename = uploadData.filePath.split("/").pop();
+            imagename = "/images/" + filename; // Update the image path
+          } else {
+            console.error("File path not returned from the server");
+          }
+        } catch (error) {
+          console.error("Error uploading image:", error);
+          return; // Exit if image upload fails
+        }
+      }
+    
+      // Step 2: Inject the updated img path into the productToSave
+      const updatedProduct = {
+        ...productToSave,
+        img: imagename,
+      };
+    
+      // Step 3: Save the updated product data
+      try {
+        const response = await fetch(`http://localhost:8080/kue/update/${id}`, {
+          method: "PUT",
+          headers: {
+            "Content-Type": "application/json",
+          },
+          body: JSON.stringify(updatedProduct),
         });
+    
+        if (!response.ok) throw new Error("Failed to update product");
+    
+        await response.json();
+    
+        // Step 4: Mark the product as saved and reset modification status
+        setModifiedProducts((prevModified) => ({
+          ...prevModified,
+          [id]: false, // Reset the modified status for this product
+        }));
+    
+        console.log("Product updated successfully!");
+      } catch (error) {
+        console.error("Error updating product:", error);
+      }
     };
+    
     
   
     const filteredProducts = products.filter((product) => {
@@ -290,6 +335,7 @@ function ManageProducts() {
               <tr>
                 <th>ID</th>
                 <th>Nama</th>
+                <th>Image</th>
                 <th>Deskripsi</th>
                 <th>Harga</th>
                 <th>Berat</th>
@@ -301,12 +347,26 @@ function ManageProducts() {
             <tbody>
               {filteredProducts.map((product) => (
                 <tr key={product.id}>
-                  <td>{product.id}</td>
+                  <td
+                    onClick={() => window.location.href = `/products/${product.id}`}
+                    onMouseEnter={(e) => (e.target.style.color = "blue")}
+                    onMouseLeave={(e) => (e.target.style.color = "inherit")}
+                    style={{ cursor: "pointer", textDecoration: "underline" }}
+                  >
+                    {product.id}
+                  </td>
                   <td>
                     <input
                       type="text"
                       value={product.nama}
                       onChange={(e) => handleInputChange(product.id, "nama", e.target.value)}
+                    />
+                  </td>
+                  <td>
+                    <input
+                      type="file"
+                      accept="image/*"
+                      onChange={(e) => handleFileUpdate(product.id, e)}
                     />
                   </td>
                   <td>
