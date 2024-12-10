@@ -54,7 +54,7 @@ INSERT INTO Varian (nama) values
 ('Choco Almond');
 
 INSERT INTO Kue (nama, img, deskripsi, harga, berat, supplier_id, varian_id) VALUES
-('Nastar','/', 'Kue kering isi selai nanas dengan rasa manis dan legit.', 50000, 0.25, 1, 1);
+('Nastar','/images/PDM.png', 'Kue kering isi selai nanas dengan rasa manis dan legit.', 50000, 0.25, 1, 1);
 -- ('Kastengel', 'Kue keju dengan rasa gurih dan tekstur renyah.', 50000, 0.25, 1, 1),
 -- ('Putri Salju', 'Kue kering tabur gula halus dengan tekstur lembut.', 50000, 0.25, 1, 1),
 -- ('Lidah Kucing', 'Kue kering tipis dan renyah dengan rasa manis.', 50000, 0.2, 1, 2),
