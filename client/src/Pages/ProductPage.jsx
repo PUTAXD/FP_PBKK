@@ -6,7 +6,7 @@ function ProductPage() {
   const [product, setProduct] = useState(null);
   const [isLooading, setIsLoading] = useState(true);
   const [variants, setVariants] = useState([]);
-  const [selectedVariant, setSelectedVariant] = useState(null);
+  const [suppliers, setSuppliers] = useState([]);
 
   function formatRupiah(amount) {
     const formattedAmount = amount
@@ -47,21 +47,47 @@ function ProductPage() {
       })
       .catch((error) => console.error("Error fetching product details:", error))
       .finally(() => setIsLoading(false));
+
+      // Fetch suppliers and variants (example URLs)
+      fetch("http://localhost:8080/supplier/all")
+        .then((res) => res.json())
+        .then((data) => setSuppliers(data))
+        .catch((error) => console.error("Error fetching suppliers:", error));
+
+      fetch("http://localhost:8080/varians/all")
+        .then((res) => res.json())
+        .then((data) => setVariants(data))
+        .catch((error) => console.error("Error fetching variants:", error));
   }, [id]);
 
   const handleVariantSelection = (variantId) => {
     setSelectedVariant(variantId);
   };
 
+  const getSupplierName = (id) => {
+    const supplier = suppliers.find((supplier) => supplier.id === id);
+    return supplier ? supplier.nama : "Unknown Supplier";
+  };
+
+  const getVariantName = (id) => {
+    if (id === 1) return "Tanpa Varian";  // Handle the case for the "Tanpa Varian"
+    const variant = variants.find((variant) => variant.id === id);
+    return variant ? variant.nama : "Unknown Variant";
+  };  
+
   if (isLooading) {
     return <p>Loading...</p>;
   }
-
-  // Find the selected variant details from the fetched data
-  const selectedProduct = variants.find(
-    (variant) => variant.id === selectedVariant
+  
+  // Ensure variants are loaded before accessing product.varian_id
+  if (!variants.length) {
+    return <p>Loading variants...</p>;
+  }
+  
+  const selectedVariant = variants.find(
+    (variant) => variant.id === product.varian_id
   );
-
+  
   return (
     <section className="py-8 bg-white md:py-16 dark:bg-gray-900 antialiased">
       <div className="max-w-screen-xl px-4 mx-auto 2xl:px-0">
@@ -74,13 +100,13 @@ function ProductPage() {
               {product.nama}
             </h1>
             <p className="mb-6 text-black text-sm dark:text-gray-400">
-              Varian {product.varian_id}
+              Varian: {selectedVariant ? selectedVariant.nama : "Unknown Variant"}
             </p>
             <p className="mb-6 text-gray-500 dark:text-gray-400">
               {product.deskripsi}
             </p>
             <p className="mt-6 text-black text-sm dark:text-gray-400">
-              Supplier {product.supplier_id}
+              Supplier: {getSupplierName(product.supplier_id)}
             </p>
             <div className=" sm:items-center sm:gap-4 sm:flex"></div>
             <div className="mt-6 sm:gap-4 sm:items-center sm:flex sm:mt-8"></div>
@@ -97,59 +123,6 @@ function ProductPage() {
         </div>
       </div>
     </section>
-
-    // <div className="product-page">
-    //   <div className="product-content " style={{ display: "flex" }}>
-    //     {/* Left side: Image */}
-    //     <div style={{ width: "60%", padding: "20px" }}>
-    //       <img src={product.img} alt={product.nama} style={{ width: "100%" }} />
-    //     </div>
-
-    //     {/* Right side: Product details */}
-    //     <div style={{ width: "40%", padding: "20px" }}>
-    //       <h1>{product.nama}</h1>
-    //       <p className="price" style={{ marginBottom: "20px" }}>
-    //         Rp {selectedProduct ? selectedProduct.harga : product.harga}
-    //       </p>
-
-    //       {/* Variants grid */}
-    //       <div
-    //         className="variant-grid"
-    //         style={{
-    //           display: "grid",
-    //           gridTemplateColumns: "repeat(auto-fit, minmax(100px, 1fr))",
-    //           gap: "10px",
-    //           marginBottom: "20px",
-    //         }}
-    //       >
-    //         {variants.map((variant) => (
-    //           <div
-    //             key={variant.id}
-    //             onClick={() => handleVariantSelection(variant.id)}
-    //             style={{
-    //               padding: "10px",
-    //               border: "1px solid #ddd",
-    //               borderRadius: "5px",
-    //               cursor: "pointer",
-    //               textAlign: "center",
-    //               backgroundColor:
-    //                 variant.id === selectedVariant ? "#ddd" : "#fff",
-    //             }}
-    //           >
-    //             {variant.harga}
-    //           </div>
-    //         ))}
-    //       </div>
-
-    //       {/* Description */}
-    //       <div
-    //         style={{ borderBottom: "1px solid #ddd", paddingBottom: "20px" }}
-    //       >
-    //         <p>{product.deskripsi}</p>
-    //       </div>
-    //     </div>
-    //   </div>
-    // </div>
   );
 }
 

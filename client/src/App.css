@@ -185,7 +185,7 @@
   width: 100%; /* Make the button fill the entire width of the anchor */
   padding: 10px;
   border: none;
-  background-color: #007bff;
+  background-color: #685752;
   color: white;
   border-radius: 5px;
   cursor: pointer;
@@ -193,7 +193,7 @@
 }
 
 .mng-product-btn:hover {
-  background-color: #0056b3;
+  background-color: #997C70;
 }
 
 .add-btn {
@@ -205,6 +205,20 @@
   border-radius: 5px;
   cursor: pointer;
   transition: background-color 0.3s;
+  background-color: #685752;
+  cursor: pointer;
+}
+
+.add-btn:hover {
+  background-color: #997C70;
+}
+
+.confirm-add-btn {
+  background-color: #8EB486;
+}
+
+.confirm-add-btn:hover {
+  background-color: #7fa977;
 }
 
 .save-btn {
@@ -216,11 +230,11 @@
   border-radius: 5px;
   cursor: pointer;
   transition: background-color 0.3s;
-  background-color: #007bff; /* Default color */
+  width: 100%;
 }
 
 .save-btn.modified {
-  background-color: #28a745; /* Green when modified */
+  background-color: #8EB486; /* Green when modified */
 }
 
 .save-btn:disabled {
@@ -237,6 +251,7 @@
   cursor: pointer;
   transition: background-color 0.3s;
   background-color: #be0000; /* Default color */
+  width: 100%;
 }
 
 .manage-products .grid {
@@ -256,7 +271,7 @@
 
 .products-table-div {
   overflow-x: auto; /* Enable horizontal scrolling if needed */
-  margin: 20px;
+  margin: 40px;
 }
 
 .products-table {
@@ -398,3 +413,4 @@
   font-size: 1.5em;
   cursor: pointer;
 }
+
