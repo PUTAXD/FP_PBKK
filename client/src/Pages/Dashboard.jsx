@@ -18,7 +18,7 @@ function Dashboard() {
               Fresh, Baked, Happiness.
             </h1>
             <h1 className="text-3xl text-gray-600">Vanila</h1>
-            <h1 className="text-3xl text-gray-600">Choclate</h1>
+            <h1 className="text-3xl text-gray-600">Chocolate</h1>
             <h1 className="text-7xl text-gray-600">and Milk</h1>
             <p className="text-2xl text-gray-600 font-light mt-8 leading-relaxed">
               Indulge in the perfect balance of crisp and chewy textures, with

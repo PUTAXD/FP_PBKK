@@ -72,6 +72,7 @@ function ManageProducts() {
     const variant = variants.find((variant) => variant.id === id);
     return variant ? variant.nama : "Unknown Variant";
   };
+  
   const handleRefresh = () => {
     window.location.reload();
   };
@@ -96,7 +97,7 @@ function ManageProducts() {
   };
 
   const handleAdd = () => {
-    setIsAdding(true);
+    setIsAdding((prevState) => !prevState);
   };
 
   const handleConfirmAdd = async () => {
@@ -268,98 +269,129 @@ function ManageProducts() {
         <button
           className="add-btn"
           onClick={handleAdd}
-          style={{ backgroundColor: "#2196F3", cursor: "pointer" }}
         >
-          Add
+          Add Product
         </button>
       </div>
 
       {isAdding && (
-        <div className="add-product-form">
-          {/* Add product form as before */}
-          <input
-            type="text"
-            placeholder="Nama"
-            value={newProduct.nama}
-            onChange={(e) =>
-              setNewProduct((prev) => ({ ...prev, nama: e.target.value }))
-            }
-          />
-          <input
-            type="file"
-            accept="image/*"
-            onChange={handleFileChange}
-            required
-          />
-          <input
-            type="text"
-            placeholder="Deskripsi"
-            value={newProduct.deskripsi}
-            onChange={(e) =>
-              setNewProduct((prev) => ({ ...prev, deskripsi: e.target.value }))
-            }
-          />
-          <input
-            type="number"
-            placeholder="Harga"
-            value={newProduct.harga}
-            onChange={(e) =>
-              setNewProduct((prev) => ({
-                ...prev,
-                harga: Number(e.target.value),
-              }))
-            }
-          />
-          <input
-            type="number"
-            placeholder="Berat"
-            value={newProduct.berat}
-            onChange={(e) =>
-              setNewProduct((prev) => ({
-                ...prev,
-                berat: Number(e.target.value),
-              }))
-            }
-          />
-          <select
-            value={newProduct.supplier_id}
-            onChange={(e) =>
-              setNewProduct((prev) => ({
-                ...prev,
-                supplier_id: Number(e.target.value),
-              }))
-            }
-          >
-            <option value="">Select Supplier</option>
-            {suppliers.map((supplier) => (
-              <option key={supplier.id} value={supplier.id}>
-                {supplier.id}-{supplier.nama}
-              </option>
-            ))}
-          </select>
-          <select
-            value={newProduct.varian_id}
-            onChange={(e) =>
-              setNewProduct((prev) => ({
-                ...prev,
-                varian_id: Number(e.target.value),
-              }))
-            }
-          >
-            <option value="">Select Varian</option>
-            {variants.map((variant) => (
-              <option key={variant.id} value={variant.id}>
-                {variant.id}-{variant.nama}
-              </option>
-            ))}
-          </select>
-          <button
-            onClick={handleConfirmAdd}
-            className="confirm-add-btn"
-            style={{ marginTop: "10px" }}
-          >
-            Confirm Add
-          </button>
+        <div
+          className="add-product-form bg-gray-100 rounded-lg p-5 shadow-lg"
+          style={{ margin: "40px" }}
+        >
+          <div className="flex flex-col space-y-4">
+            {/* Nama Input */}
+            <label className="text-base font-semibold text-gray-700">Nama</label>
+            <input
+              type="text"
+              className="w-full p-2 border border-gray-300 rounded-lg"
+              placeholder="Nama"
+              value={newProduct.nama}
+              onChange={(e) =>
+                setNewProduct((prev) => ({ ...prev, nama: e.target.value }))
+              }
+            />
+
+            {/* Image Upload */}
+            <label className="text-base font-semibold text-gray-700">Upload Gambar</label>
+            <input
+              type="file"
+              className="w-full p-2 border border-gray-300 rounded-lg"
+              accept="image/*"
+              onChange={handleFileChange}
+              required
+            />
+
+            {/* Deskripsi Input */}
+            <label className="text-base font-semibold text-gray-700">Deskripsi</label>
+            <input
+              type="text"
+              className="w-full p-2 border border-gray-300 rounded-lg"
+              placeholder="Deskripsi"
+              value={newProduct.deskripsi}
+              onChange={(e) =>
+                setNewProduct((prev) => ({ ...prev, deskripsi: e.target.value }))
+              }
+            />
+
+            {/* Harga Input */}
+            <label className="text-base font-semibold text-gray-700">Harga</label>
+            <input
+              type="number"
+              className="w-full p-2 border border-gray-300 rounded-lg"
+              placeholder="Harga"
+              value={newProduct.harga}
+              onChange={(e) =>
+                setNewProduct((prev) => ({
+                  ...prev,
+                  harga: Number(e.target.value),
+                }))
+              }
+            />
+
+            {/* Berat Input */}
+            <label className="text-base font-semibold text-gray-700">Berat</label>
+            <input
+              type="number"
+              className="w-full p-2 border border-gray-300 rounded-lg"
+              placeholder="Berat"
+              value={newProduct.berat}
+              onChange={(e) =>
+                setNewProduct((prev) => ({
+                  ...prev,
+                  berat: Number(e.target.value),
+                }))
+              }
+            />
+
+            {/* Supplier Select */}
+            <label className="text-base font-semibold text-gray-700">Supplier</label>
+            <select
+              className="w-full p-2 border border-gray-300 rounded-lg"
+              value={newProduct.supplier_id}
+              onChange={(e) =>
+                setNewProduct((prev) => ({
+                  ...prev,
+                  supplier_id: Number(e.target.value),
+                }))
+              }
+            >
+              <option value="">Select Supplier</option>
+              {suppliers.map((supplier) => (
+                <option key={supplier.id} value={supplier.id}>
+                  {supplier.id}-{supplier.nama}
+                </option>
+              ))}
+            </select>
+
+            {/* Varian Select */}
+            <label className="text-base font-semibold text-gray-700">Varian</label>
+            <select
+              className="w-full p-2 border border-gray-300 rounded-lg"
+              value={newProduct.varian_id}
+              onChange={(e) =>
+                setNewProduct((prev) => ({
+                  ...prev,
+                  varian_id: Number(e.target.value),
+                }))
+              }
+            >
+              <option value="">Select Varian</option>
+              {variants.map((variant) => (
+                <option key={variant.id} value={variant.id}>
+                  {variant.id}-{variant.nama}
+                </option>
+              ))}
+            </select>
+
+            {/* Confirm Button */}
+            <button
+              onClick={handleConfirmAdd}
+              className="confirm-add-btn w-full p-2 mt-4 text-white rounded-lg"
+            >
+              Confirm Add
+            </button>
+          </div>
         </div>
       )}
       <div className="products-table-div">
