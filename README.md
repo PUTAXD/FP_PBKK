@@ -31,9 +31,11 @@ Pemanggilan `http://localhost:8080/upload` untuk menerima gambar baru, dan row d
 
 ### Products (Single)
 ![image](https://github.com/user-attachments/assets/a1155710-076a-4c2a-89f4-a15cb957446e)
+Pemanggilan `http://localhost:8080/kue/${id}`, `http://localhost:8080/supplier/all`, dan `http://localhost:8080/varians/all` untuk mendapatkan data sebuah kue, semua data supplier, dan semua data varian.
 
 ### Supplier
 ![image](https://github.com/user-attachments/assets/4a3fff0f-33a9-4490-a7c4-2d3e3f272d1c)
+Pemanggilan `http://localhost:8080/supplier/all` untuk mendapatkan data semua supplier dan ditampilkan datanya dalam grid.
 
 ## Link Video
 https://youtu.be/gyj3b2Dy8o0
