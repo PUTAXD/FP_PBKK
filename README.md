@@ -1,5 +1,5 @@
 ## Anggota Kelompok
-Jeremy James | 5025221139
+Jeremy James | 5025221139 <br>
 Putu Indra Mahendra | 5025221215
 
 ## Overview
@@ -23,3 +23,5 @@ Kami membuat website e-commerce untuk sebuah toko kue bernama Toko Pak Budi. Hal
 ### Supplier
 ![image](https://github.com/user-attachments/assets/4a3fff0f-33a9-4490-a7c4-2d3e3f272d1c)
 
+## Link Video
+https://youtu.be/gyj3b2Dy8o0
