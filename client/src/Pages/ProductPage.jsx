@@ -23,9 +23,8 @@ function ProductPage() {
         return res.json();
       })
       .then((data) => {
-        console.log("Main product details:", data); // Log the main product details
         setProduct(data);
-        setSelectedVariant(data.id); // Set the initial selected variant as the main product's ID
+        setSelectedVariant(data.id);
 
         // Fetch all variant details based on the main product's variants
         const variantIds = data.variant_ids || [];
@@ -100,10 +99,13 @@ function ProductPage() {
               {product.nama}
             </h1>
             <p className="mb-6 text-black text-sm dark:text-gray-400">
-              Varian: {selectedVariant ? selectedVariant.nama : "Unknown Variant"}
+              Varian: { getVariantName(product.varian_id)}
             </p>
-            <p className="mb-6 text-gray-500 dark:text-gray-400">
+            <p className="mb-2 text-gray-500 dark:text-gray-400">
               {product.deskripsi}
+            </p>
+            <p className="mb-6 text-xs text-gray-500 dark:text-gray-400">
+              Berat: {product.berat * 1000} gram
             </p>
             <p className="mt-6 text-black text-sm dark:text-gray-400">
               Supplier: {getSupplierName(product.supplier_id)}
@@ -116,7 +118,7 @@ function ProductPage() {
                 {formatRupiah(product.harga)}
               </p>
               <button class="px-6 mt-2 py-2 bg-blue-600 text-white font-medium rounded hover:bg-blue-700">
-                Add To Chart
+                Add To Cart
               </button>
             </div>
           </div>
