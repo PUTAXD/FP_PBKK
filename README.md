@@ -6,6 +6,20 @@ Putu Indra Mahendra | 5025221215
 Kami membuat website e-commerce untuk sebuah toko kue bernama Toko Pak Budi. Halaman dari web kami ada Dashboard, Products (Listing), Manage Products, Product (Single),  Supplier. Untuk BE menggunakan Go dan Gin, sedangkan untuk FE menggunakan React.
 
 ## Penjelasan API
+```
+//varian
+	r.GET("/varians/all", apivariant.GetVarian)
+
+	//supplier
+	r.GET("/supplier/all", apisupplier.GetSupplier)
+
+	//kue
+	r.GET("/kue/all", apikue.GetKue)
+	r.GET("/kue/:id", apikue.DetailKue)
+	r.POST("/kue/add", apikue.AddKue)
+	r.PUT("/kue/update/:id", apikue.UpdateKue)
+	r.DELETE("/kue/delete/:id", apikue.DeleteKue)
+```
 
 ## Penerapan API per Halaman
 ### Dashboard
