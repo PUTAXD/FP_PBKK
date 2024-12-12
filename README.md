@@ -7,10 +7,10 @@ Kami membuat website e-commerce untuk sebuah toko kue bernama Toko Pak Budi. Hal
 
 ## Penjelasan API
 ```
-//varian
+	// Varian
 	r.GET("/varians/all", apivariant.GetVarian)
 
-	//supplier
+	// Supplier
 	r.GET("/supplier/all", apisupplier.GetSupplier)
 
 	//kue
@@ -19,7 +19,12 @@ Kami membuat website e-commerce untuk sebuah toko kue bernama Toko Pak Budi. Hal
 	r.POST("/kue/add", apikue.AddKue)
 	r.PUT("/kue/update/:id", apikue.UpdateKue)
 	r.DELETE("/kue/delete/:id", apikue.DeleteKue)
+
+	// Untuk Upload Gambar Kue
+ 	r.POST("/upload", func(c *gin.Context) 
 ```
+Disini API yang kita pakai untuk menjalankan applikasi, get Varian untuk mendapatkan list varian, get Supplier untuk mendapatkan list supplier, dan fitur CRUD yang dimiliki model Kue. Disini juga ada api  "/upload" dimana fungsi ini bertugas untuk menyimpan gambar static ke dalam public/image pada react.
+
 
 ## Penerapan API per Halaman
 ### Dashboard
