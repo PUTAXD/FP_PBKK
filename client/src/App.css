@@ -122,18 +122,22 @@
 }
 
 .card-image {
-  flex: 0 0 150px; /* Sets a consistent height for the image section */
+  flex: 0 0 300px; /* Sets a consistent height for the image section */
   background-color: #f9f9f9;
   display: flex;
   align-items: center;
   justify-content: center;
+  border-radius: 8px;
+  overflow: hidden;
 }
 
 .card-image img {
   width: 100%;
-  height: auto;
+  height: 100%;
   object-fit: cover;
+  object-position: center;
 }
+
 
 .card-details {
   flex-grow: 1; /* Fills available space */
